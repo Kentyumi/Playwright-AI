@@ -1,5 +1,5 @@
-import { TestcaseParser } from '../ai/testcases/testcaseParser';
-import { PlaywrightTestGenerator } from './generators/playwrightTestGenerator';
+import { TestcaseParser } from '../testcases/testcaseParser';
+import { PlaywrightTestGenerator } from '../generators/playwrightTestGenerator';
 
 const filePath = process.argv[2] || 'src/ai/testcases/demo.txt';
 
