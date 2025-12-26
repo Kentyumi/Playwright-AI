@@ -1,8 +1,12 @@
 import { TestcaseParser } from '../ai/testcases/testcaseParser';
+import { PlaywrightTestGenerator } from './generators/playwrightTestGenerator';
 
-const result = TestcaseParser.parseFromTxt(
-  'src/ai/testcases/login_checkout_success.txt'
-);
+const filePath = process.argv[2] || 'src/ai/testcases/demo.txt';
 
-console.log('=== AI PARSED JSON ===');
-console.log(JSON.stringify(result, null, 2));
+const testcase = TestcaseParser.parseFromTxt(filePath);
+
+console.log('Parsed testcase:', JSON.stringify(testcase, null, 2));
+
+PlaywrightTestGenerator.generate(testcase);
+
+

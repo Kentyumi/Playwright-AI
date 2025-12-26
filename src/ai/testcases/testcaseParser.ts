@@ -1,85 +1,80 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import { Testcase, TestStep } from '../models/TestcaseModel';
 
 export class TestcaseParser {
-  static parseFromTxt(filePath: string): any {
+  static parseFromTxt(filePath: string): Testcase {
     const content = fs.readFileSync(path.resolve(filePath), 'utf-8');
-    const rawOutput = this.runAI(this.buildMainPrompt(content));
+    const rawOutput = this.runAI(this.buildPrompt(content));
 
-    try {
-      return JSON.parse(this.extractJson(rawOutput));
-    } catch (e) {
-      // 🔁 Fallback: ask AI to fix JSON
-      const fixedOutput = this.runAI(
-        this.buildFixJsonPrompt(rawOutput)
-      );
+    const jsonBlock = this.extractJson(rawOutput);
+    const parsed = this.safeParse(jsonBlock);
 
-      return JSON.parse(this.extractJson(fixedOutput));
-    }
+    return {
+      testName: parsed.testName || 'Unnamed test',
+      steps: Array.isArray(parsed.steps) ? parsed.steps : []
+    };
   }
 
   // =========================
-  // AI Calls
+  // AI
   // =========================
   private static runAI(prompt: string): string {
-    const command = `ollama run llama3 "${prompt.replace(/"/g, '\\"')}"`;
-
-    return execSync(command, {
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'ignore']
-    });
+    const cmd = `ollama run llama3 "${prompt.replace(/"/g, '\\"')}"`;
+    return execSync(cmd, { encoding: 'utf-8' });
   }
 
   // =========================
-  // Prompts
+  // Prompt
   // =========================
-  private static buildMainPrompt(content: string): string {
+  private static buildPrompt(content: string): string {
     return `
-You are a QA automation AI.
+Extract test steps and return them in JSON format.
 
-Convert the following manual test case into VALID JSON.
+Rules:
+- Keys MUST be in double quotes
+- Values MUST be valid JSON
+- steps MUST be an array
+- No explanation
 
-STRICT REQUIREMENTS:
-- JSON keys MUST be in double quotes
-- Output MUST be parsable by JSON.parse
-- No explanation, no markdown
-- No trailing commas
+Output format example:
+{
+  "testName": "Example",
+  "steps": [
+    { "action": "open", "url": "https://example.com" }
+  ]
+}
 
-Manual Test Case:
+Test case:
 <<<
 ${content}
 >>>
 `;
   }
 
-  private static buildFixJsonPrompt(brokenJson: string): string {
-    return `
-You are a JSON fixer.
-
-Fix the following content so that it becomes VALID JSON.
-
-Rules:
-- Output ONLY fixed JSON
-- Use double quotes for all keys
-- No explanation
-
-Broken content:
-<<<
-${brokenJson}
->>>
-`;
-  }
-
   // =========================
-  // Utils
+  // Safe parsing
   // =========================
   private static extractJson(output: string): string {
     const start = output.indexOf('{');
     const end = output.lastIndexOf('}');
     if (start === -1 || end === -1) {
-      throw new Error('No JSON found in AI output');
+      throw new Error('AI output does not contain JSON');
     }
     return output.substring(start, end + 1);
+  }
+
+  private static safeParse(jsonLike: string): any {
+    try {
+      return JSON.parse(jsonLike);
+    } catch {
+      // 🔒 Last-resort sanitizer (VERY IMPORTANT)
+      const sanitized = jsonLike
+        .replace(/(\w+)\s*:/g, '"$1":')   // quote keys
+        .replace(/'/g, '"');              // single → double quotes
+
+      return JSON.parse(sanitized);
+    }
   }
 }
