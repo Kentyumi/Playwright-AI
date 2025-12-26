@@ -13,4 +13,10 @@ export class CheckoutPage extends BasePage {
   private async verifyOrderSuccess() {
     await this.successMessage.waitFor();
   }
+
+  async addItemToCart(itemName: string) {
+  await this.page.getByText(itemName).click();
+  await this.page.getByRole('button', { name: 'Add to cart' }).click();
+}
+
 }

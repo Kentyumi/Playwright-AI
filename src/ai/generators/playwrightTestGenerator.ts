@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { Testcase, TestStep } from '../models/TestcaseModel';
-
+import { Testcase } from '../models/TestcaseModel';
 
 export class PlaywrightTestGenerator {
+
   static generate(testcase: Testcase) {
     const content = this.buildTest(testcase);
 
@@ -19,41 +19,39 @@ export class PlaywrightTestGenerator {
 
   private static buildTest(testcase: Testcase): string {
     return `
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
+import { LoginPage } from '../../src/pages/LoginPage';
+import { CheckoutPage } from '../../src/pages/CheckoutPage';
 
 test('${testcase.testName}', async ({ page }) => {
-${testcase.steps.map(step => this.buildStep(step)).join('\n')}
+  const loginPage = new LoginPage(page);
+  const checkoutPage = new CheckoutPage(page);
+
+${this.buildSteps(testcase)}
 });
 `;
   }
 
-  private static buildStep(step: TestStep): string {
-    switch (step.action) {
-      case 'open':
-        return `  await page.goto('${step.url}');`;
+  private static buildSteps(testcase: Testcase): string {
+    return testcase.steps.map(step => {
+      switch (step.action) {
 
-      case 'login':
-        return `
-  await page.fill('#user-name', '${step.username}');
-  await page.fill('#password', '${step.password}');
-  await page.click('#login-button');
-        `;
+        case 'open':
+          return `  await loginPage.open('${step.url}');`;
 
-      case 'addToCart':
-        return `
-  await page.click('text=${step.item}');
-  await page.click('button:has-text("Add to cart")');
-        `;
+        case 'login':
+          return `  await loginPage.login('${step.username}', '${step.password}');`;
 
-      case 'checkout':
-        return `
-  await page.click('.shopping_cart_link');
-  await page.click('#checkout');
-        `;
+        case 'addToCart':
+          return `  await checkoutPage.addItemToCart('${step.item}');`;
 
-      default:
-        return `  // ⚠️ Unsupported action: ${step.action}`;
-    }
+        case 'checkout':
+          return `  await checkoutPage.completeCheckout();`;
+
+        default:
+          return `  // ⚠️ Unsupported action: ${JSON.stringify(step)}`;
+      }
+    }).join('\n');
   }
 
   private static normalize(name: string): string {
