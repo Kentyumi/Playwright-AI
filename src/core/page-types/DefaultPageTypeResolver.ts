@@ -2,11 +2,12 @@ import { Page } from '@playwright/test';
 import { PageAction } from '../contracts/PageAction';
 import { BasePageContract } from '../contracts/BasePageContract';
 import { FormPage } from './FormPage';
+import { NavigationPage } from './NavigationPage';
 
 export class DefaultPageTypeResolver {
   private pageTypes: BasePageContract[] = [
+    new NavigationPage(),
     new FormPage(),
-    // ListPage, ModalPage will be added later
   ];
 
   async resolve(page: Page, action: PageAction): Promise<void> {

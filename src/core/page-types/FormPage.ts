@@ -16,47 +16,81 @@ export class FormPage implements BasePageContract {
                 break;
 
             case 'submit':
-                await this.submitForm(page, action);
+                await this.submitForm(page);
                 break;
         }
     }
 
+    // ✅ UPDATED
     private async fillField(page: Page, action: PageAction) {
-        if (!action.target || !action.value) {
+        if (!action.target || action.value === undefined) {
             throw new Error('Fill action requires target and value');
         }
 
-        const candidates = await page.locator('input, textarea').all();
+        const target = action.target.toLowerCase();
+        const inputs = await page.locator('input, textarea').all();
 
-        for (const input of candidates) {
-            const attrs = await input.evaluate(el => ({
-                name: el.getAttribute('name'),
-                id: el.getAttribute('id'),
-                placeholder: el.getAttribute('placeholder'),
-                ariaLabel: el.getAttribute('aria-label'),
-                type: el.getAttribute('type'),
-            }));
+        type Candidate = {
+            locator: any;
+            score: number;
+            meta: Record<string, string | null>;
+        };
 
-            const joined = Object.values(attrs)
-                .filter(Boolean)
-                .join(' ')
-                .toLowerCase();
+        const candidates: Candidate[] = [];
 
-            if (joined.includes(action.target.toLowerCase())) {
-                await input.fill(action.value);
-                return;
+        for (const input of inputs) {
+            const meta = await input.evaluate(el => {
+                const label =
+                    el.id &&
+                    document.querySelector(`label[for="${el.id}"]`)?.innerHTML.trim();
+
+                return {
+                    name: el.getAttribute('name'),
+                    id: el.getAttribute('id'),
+                    placeholder: el.getAttribute('placeholder'),
+                    ariaLabel: el.getAttribute('aria-label'),
+                    label,
+                    type: el.getAttribute('type'),
+                };
+            });
+
+            let score = 0;
+
+            for (const value of Object.values(meta)) {
+                if (!value) continue;
+
+                const v = value.toLowerCase();
+                if (v === target) score += 5;
+                else if (v.includes(target)) score += 2;
+            }
+
+            if (score > 0) {
+                candidates.push({ locator: input, score, meta });
             }
         }
 
-        throw new Error(`Cannot find input field matching target: ${action.target}`);
+        if (candidates.length === 0) {
+            throw new Error(
+                `Cannot find input field for target "${action.target}".`
+            );
+        }
+
+        candidates.sort((a, b) => b.score - a.score);
+        await candidates[0].locator.fill(action.value);
     }
 
-
+    // ✅ OPTIONAL but recommended
     private async submitForm(page: Page) {
         const buttons = await page.locator('button, input[type="submit"]').all();
 
         for (const btn of buttons) {
-            const text = (await btn.innerText()).toLowerCase();
+            const text = (
+                (await btn.innerText()) ||
+                (await btn.getAttribute('value')) ||
+                (await btn.getAttribute('aria-label')) ||
+                ''
+            ).toLowerCase();
+
             if (
                 text.includes('login') ||
                 text.includes('submit') ||
@@ -70,5 +104,4 @@ export class FormPage implements BasePageContract {
 
         throw new Error('No submit button found on form');
     }
-
 }
