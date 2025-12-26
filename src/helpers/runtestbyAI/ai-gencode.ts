@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
-import { TestcaseParser } from '../../../testcases/testcaseParser';
+import { TestcaseParser } from '../testcases/parseToJson';
 import { PageObjectGenerator } from '../page-generator/PageObjectGenerator';
 
-const filePath = process.argv[2] || 'testcases/runtest/demo.txt';
+// Get file path from command line args or use default
+const filePath = process.argv[2] || 'product/fptshop/testcases/raw/fptshop-search.txt';
 
 // Parse testcase file
 const ext = path.extname(filePath);

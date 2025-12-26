@@ -1,0 +1,19 @@
+Test Suite: Search Function – FPT Shop
+URL: https://fptshop.com.vn/
+
+--------------------------------------------------
+TC01 – Search with valid keyword
+--------------------------------------------------
+Pre-condition:
+- User is on FPT Shop homepage
+
+Steps:
+1. Open https://fptshop.com.vn/
+2. Click on the search input field
+3. Enter keyword: "iPhone"
+4. Press Enter or click Search icon
+
+Expected Result:
+- Search result page is displayed
+- List of products related to "iPhone" is shown
+- Each product title contains "iPhone" or relevant model

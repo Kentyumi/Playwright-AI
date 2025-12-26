@@ -43,7 +43,7 @@ export class PageObjectGenerator {
         }
 
         // generate test file
-        const testFilePath = path.resolve(`src/tests/generated/${this.normalize(testcase.testName)}.spec.ts`);
+        const testFilePath = path.resolve(`demo-project/testcases/generated/${this.normalize(testcase.testName)}.spec.ts`);
         const testContent = this.buildTestContent(testcase, pages);
         fs.writeFileSync(testFilePath, testContent, 'utf-8');
         console.log(`✅ Generated test: ${testFilePath}`);
@@ -66,20 +66,19 @@ export class PageObjectGenerator {
 
     private static buildPageContent(page: PageFile): string {
         const methods = page.methods.map(m => {
-            const stepsStr = m.steps
-                .map(step => {
-                    // Placeholder for step implementation
-                    return `    // TODO: implement ${step.action} step`;
-                })
-                .join('\n');
-            return `  async ${m.name}() {\n${stepsStr}\n  }`;
+            return `  async ${m.name}(step: any) {
+    await this.performStep(step);
+  }`;
         }).join('\n\n');
 
         return `
 import { Page } from '@playwright/test';
+import { BasePage } from '../../core/basePage';
 
-export class ${page.name} {
-  constructor(private page: Page) {}
+export class ${page.name} extends BasePage {
+  constructor(page: Page) {
+    super(page);
+  }
 
 ${methods}
 }
@@ -120,3 +119,5 @@ ${stepCalls}
         return name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     }
 }
+
+

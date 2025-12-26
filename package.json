@@ -5,8 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "gencode": "ts-node src/ai/runtest/runPipeline.ts src/ai/testcases/raw/demo.txt",
-    "testcode": "npx playwright test src/tests/generated/login-and-checkout-successfully.spec.ts"
+
+    "gen_json_case":"ts-node src/helpers/testcases/parseToJson.ts product/fptshop/testcases/raw/fptshop-search.txt",
+
+    "gencode_demo": "ts-node src/AI-helpers/runtestbyAI/ai-gencode.ts demo-project/testcases/raw/demo.txt",
+    "testcode_demo": "npx playwright test demo-project/test/generated/login-and-checkout-successfully.spec.ts"
   },
   "keywords": [],
   "author": "",

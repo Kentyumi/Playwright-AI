@@ -428,7 +428,7 @@ switch(step.action) {
 }
 4️⃣ Output test file
 
-📄 src/tests/generated/login_checkout.spec.ts
+📄 demo-project/test/generated/login_checkout.spec.ts
 
 Done when
 

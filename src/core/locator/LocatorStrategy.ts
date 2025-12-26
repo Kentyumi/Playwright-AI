@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { TestStep } from '../../AI-helpers/models/TestcaseModel';
+import { TestStep } from '../../helpers/models/TestcaseModel';
 
 export class LocatorStrategy {
 
