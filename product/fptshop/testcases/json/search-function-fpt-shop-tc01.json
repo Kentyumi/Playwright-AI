@@ -1,0 +1,22 @@
+{
+  "testName": "Search Function – FPT Shop TC01",
+  "steps": [
+    {
+      "action": "open",
+      "url": "https://fptshop.com.vn/"
+    },
+    {
+      "action": "click",
+      "element": "search input field"
+    },
+    {
+      "action": "enter",
+      "value": "iPhone",
+      "field": "keyword"
+    },
+    {
+      "action": "press",
+      "key": "Enter"
+    }
+  ]
+}

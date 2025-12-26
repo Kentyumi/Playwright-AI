@@ -1,0 +1,51 @@
+{
+  "testName": "Enquiry Voucher (by CAN)-1",
+  "steps": [
+    {
+      "action": "login",
+      "userId": "Sponsor (by CAN)"
+    },
+    {
+      "action": "click",
+      "element": "New Voucher"
+    },
+    {
+      "action": "fillForm",
+      "fields": [
+        {
+          "name": "Direct Credit Option",
+          "value": "Card"
+        },
+        {
+          "name": "CAN",
+          "value": "8000080000000046"
+        },
+        {
+          "name": "Voucher Amount (in cents)",
+          "value": 20000
+        },
+        {
+          "name": "Order Number",
+          "value": 50
+        },
+        {
+          "name": "Order Description",
+          "value": "test AI"
+        }
+      ]
+    },
+    {
+      "action": "click",
+      "element": "Save"
+    },
+    {
+      "action": "click",
+      "element": "gift box icon (Voucher)"
+    },
+    {
+      "action": "select",
+      "element": "Enquiry (CAN)",
+      "optionValue": "8000080000000046"
+    }
+  ]
+}

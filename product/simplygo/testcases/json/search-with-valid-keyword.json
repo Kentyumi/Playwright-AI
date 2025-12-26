@@ -1,0 +1,22 @@
+{
+  "testName": "Search with valid keyword",
+  "steps": [
+    {
+      "action": "open",
+      "url": "https://fptshop.com.vn/"
+    },
+    {
+      "action": "click",
+      "element": "search input field"
+    },
+    {
+      "action": "enter",
+      "value": "iPhone",
+      "input": "search"
+    },
+    {
+      "action": "press",
+      "key": "Enter"
+    }
+  ]
+}
