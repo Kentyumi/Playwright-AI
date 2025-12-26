@@ -1,9 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+import dotenv from 'dotenv';
 import { execSync } from 'child_process';
 import { Testcase, TestStep } from '../models/TestcaseModel';
 
+dotenv.config();
+
 export class TestcaseParser {
+
   static parseFromTxt(filePath: string): Testcase {
     const content = fs.readFileSync(path.resolve(filePath), 'utf-8');
     const rawOutput = this.runAI(this.buildPrompt(content));
@@ -78,3 +82,32 @@ ${content}
     }
   }
 }
+
+// Get file path from command line args or use default
+const filePath = process.argv[2] || 'demo-project/testcases/raw/demo.txt';
+const projectName = process.env.PROJECT_NAME || 'demo-project'; 
+
+const testcase = TestcaseParser.parseFromTxt(filePath);
+
+// 1️⃣ Log parsed testcase
+console.log('Parsed testcase:', JSON.stringify(testcase, null, 2));
+
+// 2️⃣ Save JSON to file
+const normalizedName = testcase.testName
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-');
+
+const outputJsonPath = path.resolve(
+  `${projectName}/testcases/json/${normalizedName}.json`
+);
+
+// ensure folder exists
+fs.mkdirSync(path.dirname(outputJsonPath), { recursive: true });
+
+fs.writeFileSync(
+  outputJsonPath,
+  JSON.stringify(testcase, null, 2),
+  'utf-8'
+);
+
+console.log(`✅ JSON saved: ${outputJsonPath}`);
