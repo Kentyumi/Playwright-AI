@@ -1,0 +1,519 @@
+# 🎯 Goal
+
+Build an **AI-powered system that can automatically run web tests from input test case files (Excel / CSV / Gherkin / Text)** using **Playwright**, and generate results that are convincing enough to demo to customers.
+
+---
+
+# 🧠 High-Level Architecture
+
+```
+Test Case File
+   ↓
+AI Test Case Parser (LLM)
+   ↓
+Structured Test Model (JSON)
+   ↓
+AI Locator Engine
+   ↓
+Playwright Test Generator
+   ↓
+Test Execution Engine
+   ↓
+Report (HTML + Screenshots + Logs)
+```
+
+---
+
+# 🧩 Tech Stack (100% Free)
+
+| Layer             | Tool                                                   |
+| ----------------- | ------------------------------------------------------ |
+| Test Runner       | Playwright (TS)                                        |
+| AI (LLM)          | Ollama (Llama3 / Qwen2.5)                              |
+| Vision (optional) | Playwright Screenshot + LLM                            |
+| Parsing           | LangChain JS                                           |
+| Report            | Playwright HTML Report                                 |
+| Demo Website      | [https://www.saucedemo.com](https://www.saucedemo.com) |
+
+---
+
+# 🌐 Demo Website Choice
+
+**SauceDemo** – perfect for demo
+
+* Stable
+* E-commerce flow
+* Login → Add to cart → Checkout
+* Widely trusted by QA community
+
+---
+
+# 🌳 Git Branch Strategy (VERY IMPORTANT)
+
+```
+main
+ ├─ infra/playwright-base
+ ├─ feature/testcase-parser
+ ├─ feature/ai-locator-engine
+ ├─ feature/test-generator
+ ├─ feature/ai-runner
+ ├─ feature/reporting
+ └─ demo/customer-demo
+```
+
+⚠️ Rule: **Only merge when branch goal is DONE + documented**
+
+---
+
+# 🪜 STEP-BY-STEP ROADMAP
+
+## STEP 0 – Infrastructure (Branch: infra/playwright-base)
+
+### Environment
+
+* OS: macOS
+* NodeJS: 24.1.0
+* Package manager: npm
+
+### Init repository
+
+```bash
+mkdir playwright-ai && cd playwright-ai
+npm init -y
+npm i -D @playwright/test typescript ts-node dotenv
+npx playwright install
+```
+
+### TypeScript setup (tsconfig.json)
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "types": ["node", "@playwright/test"]
+  }
+}
+```
+
+### Folder structure
+
+```
+playwright-ai/
+ ├─ src/
+ │   ├─ core/
+ │   │   ├─ browser.ts
+ │   │   ├─ basePage.ts
+ │   │   └─ logger.ts
+ │   ├─ pages/
+ │   │   ├─ login.page.ts
+ │   │   ├─ inventory.page.ts
+ │   │   └─ checkout.page.ts
+ │   ├─ ai/
+ │   ├─ tests/
+ │   └─ utils/
+ ├─ testcases/
+ ├─ playwright.config.ts
+ └─ .env
+```
+
+### playwright.config.ts
+
+```ts
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './src/tests',
+  timeout: 60_000,
+  retries: 0,
+  use: {
+    headless: false,
+    screenshot: 'only-on-failure',
+    trace: 'on-first-retry'
+  },
+  reporter: [['html', { open: 'never' }]]
+});
+```
+
+### BasePage (src/core/basePage.ts)
+
+```ts
+import { Page } from '@playwright/test';
+
+export class BasePage {
+  protected page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
+
+  async click(selector: string) {
+    await this.page.locator(selector).click();
+  }
+
+  async type(selector: string, text: string) {
+    await this.page.locator(selector).fill(text);
+  }
+}
+```
+
+### Exit criteria
+
+✅ Playwright runs on macOS + Node 24
+
+---
+
+## STEP 1 – Test Case Parser (Branch: feature/testcase-parser)
+
+### Input example (Excel / Text)
+
+```
+1. Open website
+2. Login with standard_user / secret_sauce
+3. Add "Sauce Labs Backpack" to cart
+4. Checkout
+5. Verify order success
+```
+
+### Output JSON
+
+```json
+{
+  "steps": [
+    {"action":"open","target":"homepage"},
+    {"action":"login","user":"standard_user","password":"secret_sauce"},
+    {"action":"add_to_cart","product":"Sauce Labs Backpack"},
+    {"action":"checkout"},
+    {"action":"verify","text":"Thank you for your order"}
+  ]
+}
+```
+
+### AI usage
+
+* Ollama local LLM
+* Prompt → convert raw testcases → structured JSON
+
+### Exit criteria
+
+✅ Any text testcase → valid JSON
+
+---
+
+## STEP 2 – AI Locator Engine (Branch: feature/ai-locator-engine)
+
+### Problem
+
+Locators change → tests break
+
+### Solution
+
+**Hybrid Locator Strategy**
+
+1. Try known locator
+2. If failed → analyze DOM
+3. Screenshot + DOM → AI
+4. AI suggests best selector
+
+### Locator score system
+
+```ts
+{
+  selector: "[data-test='add-to-cart-sauce-labs-backpack']",
+  confidence: 0.93
+}
+```
+
+### Exit criteria
+
+✅ Can recover from broken locator
+
+---
+
+## STEP 3 – Test Generator (Branch: feature/test-generator)
+
+### Input
+
+Structured JSON
+
+### Output
+
+Playwright test code (English only)
+
+```ts
+// Auto-generated by AI
+// This test was generated from business test cases
+
+test('Checkout flow', async ({ page }) => {
+  await page.goto(BASE_URL);
+  await loginPage.login('standard_user', 'secret_sauce');
+  await inventoryPage.addProduct('Sauce Labs Backpack');
+  await checkoutPage.completeCheckout();
+  await expect(page.locator('.complete-header')).toHaveText('Thank you for your order!');
+});
+```
+
+### Exit criteria
+
+✅ JSON → runnable test
+
+---
+
+## STEP 4 – AI Runner (Branch: feature/ai-runner)
+
+### Goal
+
+Run tests **without human decision**
+
+### Features
+
+* Detect failure
+* Retry with new locator
+* Self-healing execution
+
+### Flow
+
+```
+Run → Fail → Ask AI → Fix → Re-run
+```
+
+### Exit criteria
+
+✅ Test can self-heal at runtime
+
+---
+
+## STEP 5 – Reporting (Branch: feature/reporting)
+
+### Output
+
+* HTML report
+* Screenshot on each step
+* AI explanation of failure
+
+### Customer value
+
+"AI detected locator change and fixed it automatically"
+
+---
+
+## STEP 6 – Customer Demo (Branch: demo/customer-demo)
+
+### Demo scenario
+
+1. Customer gives Excel testcases
+2. Click "Run"
+3. AI generates tests
+4. Browser runs automatically
+5. Report opens
+
+🎉 **WOW EFFECT GUARANTEED**
+
+---
+
+# 📌 RULES YOU REQUESTED
+
+* ✅ All generated code = English (including comments)
+* ✅ Conversation context will be reused
+* ✅ Documentation saved continuously
+* ✅ Framework optimized for long-term scaling
+
+---
+
+# 🚀 NEXT ACTION
+
+🪜 STEP-BY-STEP ROADMAP (EXECUTION GUIDE)
+
+🔰 STEP 0 – Project Bootstrap
+
+Branch: infra/playwright-base
+
+What you do (exact steps)
+git checkout -b infra/playwright-base
+
+
+npm init -y
+npm i -D @playwright/test typescript ts-node dotenv
+npx playwright install
+What you code
+
+playwright.config.ts
+
+src/core/basePage.ts
+
+Done when
+
+npx playwright test runs without error
+
+➡️ Merge → main
+
+🧠 STEP 1 – Testcase Parser (AI Understanding Layer)
+
+Branch: feature/testcase-parser
+
+Goal
+
+Convert .txt manual test case → normalized JSON
+
+1️⃣ Create branch
+git checkout -b feature/testcase-parser
+2️⃣ Create folders
+mkdir -p src/ai testcases
+3️⃣ Create input testcase
+
+📄 testcases/login_checkout_success.txt
+
+(copy đúng file đã chốt)
+
+4️⃣ Create parser code
+
+📄 src/ai/testcaseParser.ts
+
+Read txt file
+
+Send content to Ollama
+
+Receive JSON
+
+5️⃣ Create runner script
+
+📄 src/ai/runParser.ts
+
+import { TestcaseParser } from './testcaseParser';
+
+
+const result = TestcaseParser.parseFromTxt(
+  'testcases/login_checkout_success.txt'
+);
+
+
+console.log(JSON.stringify(result, null, 2));
+6️⃣ Run & demo
+npx ts-node src/ai/runParser.ts
+Done when
+
+JSON printed correctly
+
+No manual mapping
+
+➡️ Merge → main
+
+⚙️ STEP 2 – Test Generator (JSON → Playwright Code)
+
+Branch: feature/test-generator
+
+Goal
+
+Generate runnable Playwright test from JSON
+
+1️⃣ Create branch
+git checkout -b feature/test-generator
+2️⃣ Create generator
+
+📄 src/ai/testGenerator.ts Responsibilities:
+
+Read JSON
+
+Map action → handler
+
+Output .spec.ts
+
+3️⃣ Action handler design
+switch(step.action) {
+  case 'login':
+    await loginPage.login(step.username, step.password);
+}
+4️⃣ Output test file
+
+📄 src/tests/generated/login_checkout.spec.ts
+
+Done when
+
+Generated test runs with npx playwright test
+
+➡️ Merge → main
+
+🧩 STEP 3 – Page Actions Layer
+
+Branch: feature/page-actions
+
+Goal
+
+Isolate UI knowledge from AI
+
+You implement
+
+login.page.ts
+
+inventory.page.ts
+
+checkout.page.ts
+
+Each file exposes business actions, not locators
+
+Done when
+
+Test generator only calls methods, never selectors
+
+➡️ Merge → main
+
+🔁 STEP 4 – AI Runner (Self-Healing)
+
+Branch: feature/ai-runner
+
+Goal
+
+Let AI fix failures automatically
+
+Flow
+
+Run → Fail → Ask AI → Update locator → Re-run
+
+Done when
+
+At least 1 locator change is auto-fixed
+
+➡️ Merge → main
+
+📊 STEP 5 – Reporting for Customer Demo
+
+Branch: feature/reporting
+
+Add
+
+Screenshots per step
+
+AI failure explanation
+
+➡️ Merge → main
+
+🎬 STEP 6 – Customer Demo
+
+Branch: demo/customer-demo
+
+Script
+
+Customer gives .txt
+
+Run one command
+
+Browser opens
+
+Test executes
+
+HTML report shown
+
+➡️ Tag release: demo-v1
+
+📌 RULES YOU REQUESTED
+
+✅ All generated code = English (including comments)
+
+✅ Conversation context will be reused
+
+✅ Documentation saved continuously
+
+✅ Framework optimized for long-term scaling
