@@ -15,22 +15,27 @@
       "element": "New Voucher"
     },
     {
-      "action": "fill",
+      "action": "input",
       "fields": [
         {
-          "name": "Direct Credit Option: Card"
+          "name": "Direct Credit Option: Card",
+          "value": "Card"
         },
         {
-          "name": "CAN: 8000080000000046"
+          "name": "CAN",
+          "value": "8000080000000046"
         },
         {
-          "name": "Voucher Amount (in cents): 20000"
+          "name": "Voucher Amount (in cents)",
+          "value": 20000
         },
         {
-          "name": "Order Number: 50"
+          "name": "Order Number",
+          "value": 50
         },
         {
-          "name": "Order Description: test AI"
+          "name": "Order Description",
+          "value": "test AI"
         }
       ]
     },
@@ -43,15 +48,11 @@
       "element": "gift box icon (Voucher)"
     },
     {
-      "action": "select",
-      "option": "Enquiry (CAN)",
-      "element": "dropdown"
-    },
-    {
-      "action": "fill",
+      "action": "input",
       "fields": [
         {
-          "name": "CAN ID: 8000080000000046"
+          "name": "CAN ID",
+          "value": "8000080000000046"
         }
       ]
     },
