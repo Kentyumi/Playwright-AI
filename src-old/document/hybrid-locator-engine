@@ -1,0 +1,27 @@
+[JSON Test Step] 
+        │
+        ▼
+[Heuristic Locator Resolver] ──> Success? ──► Yes ─► [Use Locator, Confidence=1.0] 
+        │ No
+        ▼
+[Capture Context] ──► [DOM Snapshot + Screenshot + Bounding Box] 
+        │
+        ▼
+[AI Locator Suggestion]
+        │
+        ▼
+[Verify Locator Confidence]
+        │
+   Confidence ≥ Threshold? ──► Yes ─► [Use Locator, Confidence=<1.0>] 
+        │ No
+        ▼
+[Retry / Manual Fix / Log Error]
+        │
+        ▼
+[Cache Locator] ─► [Playwright Executor]
+        │
+        ▼
+[Step Executed Successfully]
+Legend:
+ ──► : Flow of execution
+ ──> : Decision point

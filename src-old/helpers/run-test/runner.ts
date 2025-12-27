@@ -1,5 +1,5 @@
 // src/helpers/run-test/runner.ts
-import * as ParseToJson from '../../helpers/testcases/parseToJson';
+import * as ParseToJson from '../testcases/parseToJson';
 import { TestExecutor } from '../../core/runtime/TestExecutor';
 import { chromium } from '@playwright/test';
 import dotenv from 'dotenv';

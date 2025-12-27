@@ -7,5 +7,5 @@
     "outDir": "dist",
     "types": ["node", "@playwright/test"]
   },
-  "include": ["src", "testcases", "product/demo-project/pages"]
+  "include": ["src-old", "testcases", "product/demo-project/pages"]
 }
