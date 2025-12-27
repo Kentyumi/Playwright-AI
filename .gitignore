@@ -7,3 +7,4 @@ yarn-error.log
 /playwright-report
 /test-results
 /tests/generated
+/reports

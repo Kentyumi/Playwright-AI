@@ -1,12 +1,10 @@
 // src/core/locator/LocatorEngine.ts
 import { Page } from '@playwright/test';
-import { AISelectorEngine } from '../../core/locator/AISelectorEngine';
+import { OllamaClient } from '../ollama/OllamaClient';
 
 export class LocatorEngine {
     // Tìm locator từ target mô tả trong testcase
     static async find(page: Page, target: string): Promise<string> {
-        if (!target) throw new Error('LocatorEngine: target is undefined');
-
         // 1️⃣ Heuristics DOM
         const basic = await this.basicFind(page, target);
         if (basic) return basic;
@@ -19,12 +17,16 @@ export class LocatorEngine {
     }
 
     private static async basicFind(page: Page, target: string): Promise<string | undefined> {
-        target = (target || '').toLowerCase();
         if (!target) return undefined;
+        target = target.toLowerCase();
 
-        // inputs, buttons, links heuristics
-        const inputs = await page.locator('input, textarea').all();
-        for (const e of inputs) {
+        // Inputs & textareas
+        const inputs = page.locator('input, textarea');
+        try {
+            await inputs.first().waitFor({ timeout: 5000 });
+        } catch { }
+
+        for (const e of await inputs.all()) {
             const attrs = await e.evaluate(el => ({
                 name: el.getAttribute('name')?.toLowerCase(),
                 id: el.getAttribute('id')?.toLowerCase(),
@@ -41,8 +43,13 @@ export class LocatorEngine {
             }
         }
 
-        const buttons = await page.locator('button, input[type="submit"]').all();
-        for (const b of buttons) {
+        // Buttons
+        const buttons = page.locator('button, input[type="submit"]');
+        try {
+            await buttons.first().waitFor({ timeout: 5000 });
+        } catch { }
+
+        for (const b of await buttons.all()) {
             const text = (
                 (await b.innerText()) ||
                 (await b.getAttribute('value')) ||
@@ -60,13 +67,18 @@ export class LocatorEngine {
 
     private static async aiFallback(page: Page, target: string): Promise<string | undefined> {
         try {
-            console.warn(`⚠️ AI fallback skipped: MCP CLI not installed. Target="${target}"`);
-            return undefined; // fallback về basicFind hoặc alert tester
+            const dom = await page.content();
+            const suggestion = await OllamaClient.getInstance().askCSSSelector(dom, target);
+            if (suggestion) {
+                const count = await page.locator(suggestion).count();
+                if (count > 0) {
+                    console.log(`🧠 AI selector for "${target}": ${suggestion}`);
+                    return suggestion;
+                }
+            }
         } catch (err) {
             console.warn('⚠️ AI fallback failed:', err);
-            return undefined;
         }
+        return undefined;
     }
-
-
 }

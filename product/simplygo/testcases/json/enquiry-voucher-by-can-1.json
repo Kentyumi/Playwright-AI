@@ -3,11 +3,11 @@
   "steps": [
     {
       "action": "open",
-      "url": ""
+      "url": "base URL"
     },
     {
       "action": "login",
-      "account": "vendorca",
+      "username": "vendorca",
       "password": "V3nd0rL0g1&"
     },
     {
@@ -15,7 +15,7 @@
       "element": "New Voucher"
     },
     {
-      "action": "input",
+      "action": "fill",
       "fields": [
         {
           "name": "Direct Credit Option: Card",
@@ -48,13 +48,14 @@
       "element": "gift box icon (Voucher)"
     },
     {
-      "action": "input",
-      "fields": [
-        {
-          "name": "CAN ID",
-          "value": "8000080000000046"
-        }
-      ]
+      "action": "select",
+      "element": "Enquiry (CAN)",
+      "id": 8000080000000046
+    },
+    {
+      "action": "enter",
+      "element": "CAN ID",
+      "value": 8000080000000046
     },
     {
       "action": "click",

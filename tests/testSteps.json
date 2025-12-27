@@ -1,0 +1,7 @@
+{
+  "testName": "Hybrid AI Locator Test",
+  "steps": [
+    { "action": "open", "url": "https://evms-portal-uat.azurewebsites.net/" },
+    { "action": "click", "element": "Login" }
+  ]
+}
