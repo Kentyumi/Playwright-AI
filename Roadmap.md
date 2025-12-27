@@ -366,7 +366,6 @@ mkdir -p src/ai testcases
 
 📄 testcases/login_checkout_success.txt
 
-(copy đúng file đã chốt)
 
 4️⃣ Create parser code
 

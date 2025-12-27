@@ -1,3 +1,9 @@
-node_modules
-playwright-report
-test-results
+# Node.js
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# Playwright test outputs
+/playwright-report
+/test-results
+/tests/generated

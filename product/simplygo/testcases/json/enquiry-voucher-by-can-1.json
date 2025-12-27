@@ -1,0 +1,64 @@
+{
+  "testName": "Enquiry Voucher (by CAN)-1",
+  "steps": [
+    {
+      "action": "open",
+      "url": ""
+    },
+    {
+      "action": "login",
+      "account": "vendorca",
+      "password": "V3nd0rL0g1&"
+    },
+    {
+      "action": "click",
+      "element": "New Voucher"
+    },
+    {
+      "action": "input",
+      "fields": [
+        {
+          "name": "Direct Credit Option: Card",
+          "value": "Card"
+        },
+        {
+          "name": "CAN",
+          "value": "8000080000000046"
+        },
+        {
+          "name": "Voucher Amount (in cents)",
+          "value": 20000
+        },
+        {
+          "name": "Order Number",
+          "value": 50
+        },
+        {
+          "name": "Order Description",
+          "value": "test AI"
+        }
+      ]
+    },
+    {
+      "action": "click",
+      "element": "Save"
+    },
+    {
+      "action": "click",
+      "element": "gift box icon (Voucher)"
+    },
+    {
+      "action": "input",
+      "fields": [
+        {
+          "name": "CAN ID",
+          "value": "8000080000000046"
+        }
+      ]
+    },
+    {
+      "action": "click",
+      "element": "Search"
+    }
+  ]
+}
