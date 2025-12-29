@@ -1,4 +1,4 @@
-import { runTestFromJSON } from './executor/testExecutor';
+import { runTestFromJSON } from './testcase/executor/testExecutor';
 
 const testFile = process.argv[2];
 
