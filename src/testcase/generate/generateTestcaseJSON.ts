@@ -1,19 +1,30 @@
-import { parseRawText } from '../parse/parseRawText';
-import { normalizeSteps } from '../normalize/normalizeSteps';
-import { Testcase } from '../models/TestcaseModel';
+import path from 'path';
 import fs from 'fs';
+import { TestcaseParser } from '../parse/TestcaseParser';
 
-export function generateTestcaseJSON(
-  input: string,
-  output: string
-) {
-  const raw = parseRawText(input);
-  const steps = normalizeSteps(raw);
+export class GenerateTestcaseJSON {
+  static generate(inputPath: string) {
+    const parsed = TestcaseParser.parseFromTxt(inputPath);
 
-  const testcase: Testcase = {
-    testName: input,
-    steps
-  };
+    const testName = path.basename(inputPath, '.txt');
 
-  fs.writeFileSync(output, JSON.stringify(testcase, null, 2));
+    const outputDir = path.resolve(
+      process.cwd(),
+      'product/simplygo/testcases/json'
+    );
+
+    fs.mkdirSync(outputDir, { recursive: true });
+
+    const outputPath = path.join(outputDir, `${testName}.json`);
+
+    const json = {
+      testName,
+      source: inputPath,
+      steps: parsed.lines
+    };
+
+    fs.writeFileSync(outputPath, JSON.stringify(json, null, 2));
+
+    console.log(`✅ JSON saved: ${outputPath}`);
+  }
 }

@@ -1,0 +1,23 @@
+{
+  "testName": "simplygo",
+  "source": "product/simplygo/testcases/raw/simplygo.txt",
+  "steps": [
+    "Test Case: 727 (Enquiry Voucher (by CAN)-1)",
+    "Viewpoint: Verify that Sponsor (by CAN) is able to create new single voucher by CAN after clicking \"Save\" button",
+    "Description: Confirm sponsor's ability to create a new voucher using CAN and save it",
+    "Preconditions:",
+    "- Login as username=vendorca and password=V3nd0rL0g1&",
+    "Procedure:",
+    "1. Open base URL",
+    "2. Login as username=vendorca and password=V3nd0rL0g1&",
+    "3. Click on \"New Voucher\" button",
+    "4. Enter all mandatory fields with data: + Direct Credit Option: Card + CAN: 8000080000000046 + Voucher Amount (in cents): 20000 + Order Number: 50 + Order Description: test AI 4. Click on \"Save\" button",
+    "5. Click the gift box icon (Voucher) 6. From the dropdown, select \"Enquiry (CAN)\" 7. Enter CAN ID: 8000080000000046 then click \"Search\"",
+    "Expected Result:",
+    "- Enquiry Voucher (by CAN) page is displayed",
+    "- Voucher page is displayed",
+    "- New voucher is created successfully",
+    "- The message \"Voucher has been created successfully.\" is displayed after the creation",
+    "- New voucher will be searchable in the list of vouchers with voucher state = Created"
+  ]
+}

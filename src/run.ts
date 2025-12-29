@@ -1,13 +1,14 @@
-import { runTestFromJSON } from './testcase/executor/testExecutor';
-
-const testFile = process.argv[2];
-
-if (!testFile) {
-  console.error('❌ Please provide test JSON file');
-  process.exit(1);
-}
+import { TestExecutor } from '../core/testcase/executor/testExecutor';
 
 (async () => {
-  console.log('🚀 Running test:', testFile);
-  await runTestFromJSON(testFile);
+  const jsonFile = process.argv[2];
+
+  if (!jsonFile) {
+    console.error('❌ Missing testcase JSON file');
+    console.log('Usage: ts-node run.ts <testcase.json>');
+    process.exit(1);
+  }
+
+  const executor = new TestExecutor();
+  await executor.runTestFromJSON(jsonFile);
 })();

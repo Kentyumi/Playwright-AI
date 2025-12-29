@@ -3,7 +3,7 @@
   "steps": [
     {
       "action": "open",
-      "url": "base URL"
+      "url": ""
     },
     {
       "action": "login",
@@ -12,14 +12,14 @@
     },
     {
       "action": "click",
-      "element": "New Voucher"
+      "target": "New Voucher"
     },
     {
-      "action": "fill",
+      "action": "enter",
       "fields": [
         {
           "name": "Direct Credit Option: Card",
-          "value": "Card"
+          "value": "+ Card"
         },
         {
           "name": "CAN",
@@ -41,25 +41,16 @@
     },
     {
       "action": "click",
-      "element": "Save"
+      "target": "Save"
     },
     {
       "action": "click",
-      "element": "gift box icon (Voucher)"
+      "target": "gift box icon (Voucher)"
     },
     {
       "action": "select",
-      "element": "Enquiry (CAN)",
-      "id": 8000080000000046
-    },
-    {
-      "action": "enter",
-      "element": "CAN ID",
+      "target": "Enquiry (CAN)",
       "value": 8000080000000046
-    },
-    {
-      "action": "click",
-      "element": "Search"
     }
   ]
 }
